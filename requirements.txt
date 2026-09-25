@@ -1,9 +1,7 @@
+fastapi
+uvicorn[standard]
 numpy
 pandas
-matplotlib
-seaborn
 scikit-learn
-scipy
 joblib
-streamlit
-plotly
+python-multipart

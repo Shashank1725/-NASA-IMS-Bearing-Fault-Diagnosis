@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bearing Intelligence</title>
+  <link rel="stylesheet" href="/frontend/styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+</head>
+<body>
+  <canvas id="three-bg"></canvas>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">◉</span><div><strong>BEARING<span>IQ</span></strong><small>NASA IMS / PREDICTIVE MAINTENANCE</small></div></div>
+      <div class="status"><i></i><span id="api-status">CONNECTING</span><b id="model-name">MODEL</b></div>
+    </header>
+    <main>
+      <section class="hero"><div><p class="eyebrow">INTELLIGENCE CONSOLE / 02</p><h1>See failure <em>before</em><br/>it happens.</h1><p class="hero-copy">Upload a vibration feature dataset and get a live, dataset-specific view of machine health. No static evaluation images. Every metric is calculated from your current file.</p></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">IMS<br/><small>LIVE</small></div></div></section>
+      <section class="upload-zone" id="drop-zone"><div class="upload-icon">↥</div><div><h2>Drop a CSV dataset here</h2><p>or click to browse • labelled data unlocks real evaluation metrics</p></div><input id="file-input" type="file" accept=".csv" hidden/><button id="browse-btn" class="button secondary">Choose file</button></section>
+      <div id="file-meta" class="file-meta hidden"></div>
+      <section id="dashboard" class="hidden">
+        <div class="section-head"><div><p class="eyebrow">CURRENT DATASET</p><h2 id="dataset-name">—</h2></div><button id="reset-btn" class="button ghost">Clear dataset</button></div>
+        <div class="cards" id="overview-cards"></div>
+        <div class="grid two"><article class="panel chart-panel"><div class="panel-head"><div><p class="eyebrow">SIGNAL EXPLORER</p><h3>Dataset behaviour</h3></div><div class="controls"><select id="feature-select"></select><select id="chart-select"><option value="trend">Trend</option><option value="distribution">Distribution</option></select></div></div><div id="main-chart" class="chart"></div></article><article class="panel"><div class="panel-head"><div><p class="eyebrow">RISK ENGINE</p><h3>Health snapshot</h3></div></div><div id="gauge" class="chart gauge"></div><div id="risk-note" class="risk-note">Waiting for scored rows.</div></article></div>
+        <div class="grid two"><article class="panel"><div class="panel-head"><div><p class="eyebrow">DATA QUALITY</p><h3>Feature variability</h3></div></div><div id="variability-chart" class="chart"></div></article><article class="panel"><div class="panel-head"><div><p class="eyebrow">MODEL EVALUATION</p><h3 id="evaluation-title">Dataset-specific results</h3></div><span id="evaluation-badge" class="badge">NOT AVAILABLE</span></div><div id="metrics-grid" class="metrics-grid"></div><div id="confusion-chart" class="chart small-chart"></div><p id="evaluation-note" class="muted"></p></article></div>
+        <article class="panel table-panel"><div class="panel-head"><div><p class="eyebrow">OBSERVATIONS</p><h3>Prediction stream</h3></div><span id="scored-count" class="muted"></span></div><div class="table-wrap"><table><thead id="table-head"></thead><tbody id="table-body"></tbody></table></div></article>
+      </section>
+      <div id="error" class="error hidden"></div>
+    </main>
+    <footer>BEARINGIQ <span>•</span> ANALYTICS ARE COMPUTED FROM THE ACTIVE DATASET</footer>
+  </div>
+  <script src="/frontend/app.js"></script>
+</body>
+</html>
