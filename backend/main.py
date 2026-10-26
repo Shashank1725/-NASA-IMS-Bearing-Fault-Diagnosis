@@ -8,6 +8,9 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import warnings
+from sklearn.exceptions import InconsistentVersionWarning
+warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, precision_score, recall_score
@@ -195,7 +198,7 @@ def analyze_frame(frame: pd.DataFrame):
     return result
 
 
-@app.get("/api/health")
+@app.get("/health")
 def health():
     return {"status": "ok", "model_ready": MODEL is not None, "model": type(MODEL).__name__ if MODEL else None}
 
