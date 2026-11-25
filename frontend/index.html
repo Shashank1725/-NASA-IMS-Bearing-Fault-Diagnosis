@@ -7,6 +7,11 @@
   <link rel="stylesheet" href="/frontend/styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <!-- KaTeX for rendering LaTeX math formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+      onload="renderMathInElement(document.body);"></script>
 </head>
 <body>
   <canvas id="three-bg"></canvas>
@@ -16,8 +21,82 @@
       <div class="status"><i></i><span id="api-status">CONNECTING</span><b id="model-name">MODEL</b></div>
     </header>
     <main>
+      <section class="panel formulas-panel" id="formulas-section" style="margin-top: 24px;">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">MATHEMATICAL FOUNDATION</p>
+      <h2>Formulas & Feature Extraction Methodology</h2>
+    </div>
+  </div>
+
+  <div class="grid two">
+    <!-- Time-domain Signal Feature Formulas -->
+    <article class="panel">
+      <h3>1. Statistical Time-Domain Features</h3>
+      <p class="muted">Extracted from raw vibration signal \(x = [x_1, x_2, \dots, x_N]\):</p>
+      
+      <div class="formula-box">
+        <strong>Root Mean Square (RMS):</strong> (Energy indicator)
+        $$\text{RMS} = \sqrt{\frac{1}{N} \sum_{i=1}^N x_i^2}$$
+      </div>
+
+      <div class="formula-box">
+        <strong>Standard Deviation (\(\sigma\)):</strong>
+        $$\sigma = \sqrt{\frac{1}{N - 1} \sum_{i=1}^N (x_i - \mu)^2}$$
+      </div>
+
+      <div class="formula-box">
+        <strong>Kurtosis (\(K\)):</strong> (Sensitive to early-stage transient shocks)
+        $$K = \frac{\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^4}{\sigma^4} - 3$$
+      </div>
+
+      <div class="formula-box">
+        <strong>Skewness (\(S\)):</strong> (Signal asymmetry)
+        $$S = \frac{\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^3}{\sigma^3}$$
+      </div>
+
+      <div class="formula-box">
+        <strong>Crest Factor (\(CF\)) & Shape Factor (\(SF\)):</strong>
+        $$CF = \frac{x_{\text{peak}}}{\text{RMS}}, \quad SF = \frac{\text{RMS}}{\frac{1}{N}\sum_{i=1}^N |x_i|}$$
+      </div>
+    </article>
+
+    <!-- Normalization & Model Metrics -->
+    <article class="panel">
+      <h3>2. Normalization & Machine Learning Metrics</h3>
+      
+      <div class="formula-box">
+        <strong>Standard Scaling (Z-Score Normalization):</strong>
+        $$z = \frac{x - \mu_{\text{train}}}{\sigma_{\text{train}}}$$
+      </div>
+
+      <div class="formula-box">
+        <strong>Model Risk / Failure Probability:</strong>
+        $$P(\text{Fault} \mid X) = \sigma(W^T z + b) = \frac{1}{1 + e^{-(W^T z + b)}}$$
+      </div>
+
+      <div class="formula-box">
+        <strong>Classification Performance Metrics:</strong>
+        $$\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}$$
+        $$\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN}$$
+        $$F_1 = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$
+      </div>
+    </article>
+  </div>
+</section>
       <section class="hero"><div><p class="eyebrow">INTELLIGENCE CONSOLE / 02</p><h1>See failure <em>before</em><br/>it happens.</h1><p class="hero-copy">Upload a vibration feature dataset and get a live, dataset-specific view of machine health. No static evaluation images. Every metric is calculated from your current file.</p></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">IMS<br/><small>LIVE</small></div></div></section>
-      <section class="upload-zone" id="drop-zone"><div class="upload-icon">↥</div><div><h2>Drop a CSV dataset here</h2><p>or click to browse • labelled data unlocks real evaluation metrics</p></div><input id="file-input" type="file" accept=".csv" hidden/><button id="browse-btn" class="button secondary">Choose file</button></section>
+      <section class="upload-zone" id="drop-zone">
+        <div class="upload-icon">↥</div>
+        <div><h2>Drop a CSV dataset here</h2>
+          <p>or click to browse • labelled data unlocks real evaluation metrics</p>
+        </div>
+        <input id="file-input" type="file" accept=".csv" hidden/>
+        <div style="display:flex; gap:10px; margin-top: 10px;">
+          <button id="browse-btn" class="button secondary">Choose file</button>
+          <button id="load-default-btn" class="button primary">⚡ Load NASA IMS Dataset</button>
+        </div>
+        
+      </section>
       <div id="file-meta" class="file-meta hidden"></div>
       <section id="dashboard" class="hidden">
         <div class="section-head"><div><p class="eyebrow">CURRENT DATASET</p><h2 id="dataset-name">—</h2></div><button id="reset-btn" class="button ghost">Clear dataset</button></div>

@@ -283,3 +283,10 @@ with model_tab:
         st.info("No confusion matrix image was found in the plots folder.")
     st.write(f"Selected best model: **{type(model).__name__}**")
     st.warning("The current labels were created with a file-index boundary. Use verified failure labels before treating predictions as a production diagnosis.")
+
+with st.expander("📐 View Mathematical Formulas & Feature Equations"):
+    st.markdown("### Feature Extraction Formulas")
+    st.latex(r"\text{RMS} = \sqrt{\frac{1}{N} \sum_{i=1}^N x_i^2}")
+    st.latex(r"K = \frac{\frac{1}{N} \sum_{i=1}^N (x_i - \mu)^4}{\sigma^4} - 3 \quad \text{(Kurtosis)}")
+    st.latex(r"CF = \frac{x_{\text{peak}}}{\text{RMS}} \quad \text{(Crest Factor)}")
+    st.latex(r"SF = \frac{\text{RMS}}{\frac{1}{N} \sum_{i=1}^N |x_i|} \quad \text{(Shape Factor)}")

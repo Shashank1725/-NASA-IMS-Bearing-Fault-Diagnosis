@@ -97,12 +97,43 @@ function renderTable(rows) {
 function render(data) {
   active = data; $('dashboard').classList.remove('hidden'); $('dataset-name').textContent = data.filename; $('model-name').textContent = data.model.name || 'NO MODEL'; renderOverview(data); renderCharts(data); renderRisk(data); renderEvaluation(data); renderTable(data.predictions || []);
 }
+function updateFormulaLiveValues(summaryList, selectedFeature) {
+  const feat = summaryList.find(f => f.feature === selectedFeature);
+  if (!feat) return;
+
+  const liveHtml = `
+    <div class="live-calc-callout">
+      <h4>Live Values for <code>${feat.feature}</code>:</h4>
+      <ul>
+        <li><strong>Mean (\(\mu\)):</strong> ${feat.mean ? feat.mean.toFixed(5) : '—'}</li>
+        <li><strong>Std Dev (\(\sigma\)):</strong> ${feat.std ? feat.std.toFixed(5) : '—'}</li>
+        <li><strong>Min / Max:</strong> [${feat.min}, ${feat.max}]</li>
+      </ul>
+    </div>
+  `;
+  $('live-calc-container').innerHTML = liveHtml;
+  if (window.renderMathInElement) renderMathInElement($('live-calc-container'));
+}
 async function upload(file) {
   hideError(); $('file-meta').textContent = `ANALYSING ${file.name}...`; $('file-meta').classList.remove('hidden');
   const form = new FormData(); form.append('file', file);
   try { const response = await fetch('/api/analyze', { method: 'POST', body: form }); const data = await response.json(); if (!response.ok) throw new Error(data.detail || 'Upload failed'); render(data); $('file-meta').textContent = `${file.name} • ${file.size.toLocaleString()} bytes`; } catch (error) { showError(error.message); }
 }
-
+async function loadDefaultDataset(){
+  hiddenError();
+  $('file-meta').textContent='Loading default nasa ims dataset...';
+  $('file-meta').classList.remove('hidden');
+  try{
+    const response=await fetch('/api/load-default');
+    const data=await response.json();
+    if(!response.ok) throw new Error(data.detail||'Failed to load default dataset');
+    render(data);
+    $('file-meta').textContent='Loading bearing_features.csv directly from server';
+  }catch(error){
+    showError(error.message);
+  }
+}
+$('load-default-btn').onClick=loadDefaultDataset;
 $('browse-btn').onclick = () => $('file-input').click(); $('file-input').onchange = (event) => event.target.files[0] && upload(event.target.files[0]);
 $('drop-zone').ondragover = (event) => { event.preventDefault(); $('drop-zone').classList.add('drag'); }; $('drop-zone').ondragleave = () => $('drop-zone').classList.remove('drag'); $('drop-zone').ondrop = (event) => { event.preventDefault(); $('drop-zone').classList.remove('drag'); event.dataTransfer.files[0] && upload(event.dataTransfer.files[0]); };
 $('reset-btn').onclick = () => { active = null; $('dashboard').classList.add('hidden'); $('file-meta').classList.add('hidden'); $('file-input').value = ''; };
