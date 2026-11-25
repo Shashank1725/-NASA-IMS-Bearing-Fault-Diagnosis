@@ -21,7 +21,7 @@ SCALER_PATH = "models/scaler.joblib"
 FEATURES_PATH = "models/feature_columns.joblib"
 FRONTEND_DIR = "frontend"
 FRONTEND_PATH = os.path.join(FRONTEND_DIR, "index.html")
-DEFAULT_DATASET_PATH = "bearing_features.csv"
+DEFAULT_DATASET_PATH = "bearing_dataset.csv" if os.path.exists("bearing_dataset.csv") else "bearing_features.csv"
 app = FastAPI(title="Bearing Intelligence API", version="2.0.1")
 app.add_middleware(
     CORSMiddleware,
@@ -94,7 +94,7 @@ def numeric_summary(frame: pd.DataFrame):
 
 
 def find_label_column(frame: pd.DataFrame):
-    preferred = ["label", "target", "class", "fault", "failure", "bearing_state", "status"]
+    preferred = ["state", "label", "target", "class", "fault", "failure", "bearing_state", "status"]
     lowered = {str(column).lower(): column for column in frame.columns}
     for name in preferred:
         if name in lowered:
@@ -193,6 +193,11 @@ def analyze_frame(frame: pd.DataFrame):
         evaluation = evaluate_labels(frame.loc[valid, label_column], predictions, label_column)
         if evaluation:
             result["evaluation"] = evaluation
+    elif "file_index" in frame.columns:
+        benchmark_actual = (pd.to_numeric(frame.loc[valid, "file_index"], errors="coerce") >= 538).astype(int)
+        evaluation = evaluate_labels(benchmark_actual, predictions, "Run-to-failure benchmark (onset >= 538)")
+        if evaluation:
+            result["evaluation"] = evaluation
     else:
         result["evaluation"]["reason"] = "No label column detected. Showing live model risk and prediction distribution; accuracy metrics require verified labels."
     return result
@@ -209,16 +214,18 @@ def index():
 
 @app.get("/api/load-default")
 def load_default_dataset():
-    path = DEFAULT_DATASET_PATH
-    if not os.path.exists(path):
-        parent_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "bearing_features.csv")
-        if os.path.exists(parent_path):
-            path = parent_path
-        else:
-            raise HTTPException(status_code=404, detail="Default dataset file (bearing_features.csv) not found.")
+    candidates = [
+        "bearing_dataset.csv",
+        "bearing_features.csv",
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "bearing_dataset.csv"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "bearing_features.csv"),
+    ]
+    path = next((p for p in candidates if os.path.exists(p)), None)
+    if not path:
+        raise HTTPException(status_code=404, detail="Default dataset file (bearing_dataset.csv) not found.")
     frame = pd.read_csv(path)
     result = analyze_frame(frame)
-    result["filename"] = "bearing_features.csv (NASA IMS Benchmark)"
+    result["filename"] = f"{os.path.basename(path)} (Preloaded)"
     return result
 @app.post("/api/analyze")
 async def analyze(file: UploadFile = File(...)):

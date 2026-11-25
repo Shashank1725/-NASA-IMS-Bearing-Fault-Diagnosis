@@ -84,20 +84,27 @@
     </article>
   </div>
 </section>
-      <section class="hero"><div><p class="eyebrow">INTELLIGENCE CONSOLE / 02</p><h1>See failure <em>before</em><br/>it happens.</h1><p class="hero-copy">NASA IMS vibration benchmark dataset is preloaded directly. Explore live failure diagnostics, signal trends, and risk engines automatically without having to download or upload anything.</p></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">IMS<br/><small>LIVE</small></div></div></section>
-      <section class="upload-zone" id="drop-zone">
+      <section class="hero"><div><p class="eyebrow">INTELLIGENCE CONSOLE / 02</p><h1>See failure <em>before</em><br/>it happens.</h1><p class="hero-copy">The <strong>bearing_dataset.csv</strong> dataset is preloaded directly. Explore live run-to-failure vibration diagnostics, signal trends, and risk engines automatically without having to upload or download anything.</p></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">IMS<br/><small>LIVE</small></div></div></section>
+      <div class="panel" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding:14px 20px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--teal); box-shadow:0 0 10px var(--teal);"></span>
+          <span style="font-family:'DM Mono'; font-size:13px;">ACTIVE DATASET: <strong id="active-dataset-tag" style="color:var(--teal);">bearing_dataset.csv</strong> (Preloaded)</span>
+        </div>
+        <button id="toggle-upload-btn" class="button ghost" style="margin-left:auto;">📂 (Optional) Switch Dataset</button>
+      </div>
+      <section class="upload-zone hidden" id="drop-zone">
         <div class="upload-icon">↥</div>
-        <div><h2>NASA IMS Dataset Preloaded (Active)</h2>
-          <p>Drop a custom CSV here to analyze new data, or click to switch files</p>
+        <div><h2>Upload custom CSV</h2>
+          <p>Drop a custom CSV here or click to switch from preloaded bearing_dataset.csv</p>
         </div>
         <input id="file-input" type="file" accept=".csv" hidden/>
         <div style="display:flex; gap:10px; margin-top: 10px;">
-          <button id="browse-btn" class="button secondary">Upload Custom File</button>
-          <button id="load-default-btn" class="button primary">⚡ Reload NASA IMS Dataset</button>
+          <button id="browse-btn" class="button secondary">Choose file</button>
+          <button id="load-default-btn" class="button primary">⚡ Reload bearing_dataset.csv</button>
         </div>
       </section>
       <div id="file-meta" class="file-meta hidden"></div>
-      <section id="dashboard" class="hidden">
+      <section id="dashboard">
         <div class="section-head"><div><p class="eyebrow">CURRENT DATASET</p><h2 id="dataset-name">—</h2></div><button id="reset-btn" class="button ghost">Clear dataset</button></div>
         <div class="cards" id="overview-cards"></div>
         <div class="grid two"><article class="panel chart-panel"><div class="panel-head"><div><p class="eyebrow">SIGNAL EXPLORER</p><h3>Dataset behaviour</h3></div><div class="controls"><select id="feature-select"></select><select id="chart-select"><option value="trend">Trend</option><option value="distribution">Distribution</option></select></div></div><div id="main-chart" class="chart"></div></article><article class="panel"><div class="panel-head"><div><p class="eyebrow">RISK ENGINE</p><h3>Health snapshot</h3></div></div><div id="gauge" class="chart gauge"></div><div id="risk-note" class="risk-note">Waiting for scored rows.</div></article></div>

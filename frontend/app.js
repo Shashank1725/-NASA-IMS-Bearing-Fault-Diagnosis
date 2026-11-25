@@ -121,18 +121,20 @@ async function upload(file) {
 }
 async function loadDefaultDataset() {
   hideError();
-  $('file-meta').textContent = 'PRELOADING NASA IMS BENCHMARK DATASET...';
+  $('file-meta').textContent = 'LOADING PRELOADED BEARING_DATASET.CSV...';
   $('file-meta').classList.remove('hidden');
   try {
     const response = await fetch('/api/load-default');
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || 'Failed to load default dataset');
     render(data);
-    $('file-meta').textContent = 'Preloaded: bearing_features.csv (NASA IMS Benchmark) • Ready';
+    $('file-meta').textContent = 'Preloaded: bearing_dataset.csv • Active';
+    if ($('active-dataset-tag')) $('active-dataset-tag').textContent = data.filename || 'bearing_dataset.csv';
   } catch (error) {
     showError(error.message);
   }
 }
+if ($('toggle-upload-btn')) $('toggle-upload-btn').onclick = () => $('drop-zone').classList.toggle('hidden');
 if ($('load-default-btn')) $('load-default-btn').onclick = loadDefaultDataset;
 $('browse-btn').onclick = () => $('file-input').click();
 $('file-input').onchange = (event) => event.target.files[0] && upload(event.target.files[0]);
@@ -141,12 +143,13 @@ $('drop-zone').ondragleave = () => $('drop-zone').classList.remove('drag');
 $('drop-zone').ondrop = (event) => { event.preventDefault(); $('drop-zone').classList.remove('drag'); event.dataTransfer.files[0] && upload(event.dataTransfer.files[0]); };
 $('reset-btn').onclick = () => { loadDefaultDataset(); };
 
+// Preload dataset immediately on launch
+loadDefaultDataset();
+
 fetch('/api/health').then((response) => response.json()).then((data) => {
   $('api-status').textContent = data.status.toUpperCase();
   $('api-status').previousElementSibling.style.background = '#1de0bf';
   $('model-name').textContent = data.model || 'NO MODEL';
-  // Automatically load the dataset directly into the UI on page load:
-  loadDefaultDataset();
 }).catch(() => {
   $('api-status').textContent = 'OFFLINE';
 });

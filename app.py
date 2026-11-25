@@ -188,24 +188,27 @@ with st.sidebar:
     st.divider()
     st.caption("Charts, analytics, and health cards are recalculated from the current upload.")
 
-upload_tab, manual_tab, model_tab = st.tabs(["📁 Explore & diagnose", "🧪 Manual prediction", "📊 Model evaluation"])
+upload_tab, manual_tab, model_tab = st.tabs(["📊 Live Dataset & Diagnosis", "🧪 Manual prediction", "📈 Model evaluation"])
 
 with upload_tab:
-    uploaded_file = st.file_uploader(
-        "Upload custom CSV (Optional — NASA IMS Benchmark is preloaded below)",
-        type=["csv"],
-        help="Exploration works with any CSV. Diagnosis additionally requires the trained feature columns."
-    )
+    # Check for preloaded dataset
+    default_dataset = "bearing_dataset.csv" if os.path.exists("bearing_dataset.csv") else ("bearing_features.csv" if os.path.exists("bearing_features.csv") else None)
+    
+    with st.expander("📂 (Optional) Upload or switch to a different CSV dataset", expanded=False):
+        uploaded_file = st.file_uploader(
+            "Upload custom CSV file",
+            type=["csv"],
+            help="Optional: Upload your own file to replace the preloaded dataset."
+        )
     
     if uploaded_file is not None:
         source_name = uploaded_file.name
         uploaded_df = pd.read_csv(uploaded_file)
         file_token = f"{uploaded_file.name}:{uploaded_file.size}"
-    elif os.path.exists("bearing_features.csv"):
-        source_name = "bearing_features.csv (NASA IMS Benchmark - Preloaded)"
-        uploaded_df = pd.read_csv("bearing_features.csv")
-        file_token = "default_ims_bearing_features"
-        st.info("⚡ **Directly Loaded:** NASA IMS Benchmark dataset (`bearing_features.csv`) is automatically loaded. You can explore it below or upload your own CSV above.")
+    elif default_dataset:
+        source_name = f"{default_dataset} (Preloaded)"
+        uploaded_df = pd.read_csv(default_dataset)
+        file_token = f"preloaded_{default_dataset}"
     else:
         uploaded_df = None
         source_name = None
