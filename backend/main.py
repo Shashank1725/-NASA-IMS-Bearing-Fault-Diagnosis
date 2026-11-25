@@ -21,7 +21,7 @@ SCALER_PATH = "models/scaler.joblib"
 FEATURES_PATH = "models/feature_columns.joblib"
 FRONTEND_DIR = "frontend"
 FRONTEND_PATH = os.path.join(FRONTEND_DIR, "index.html")
-DEFAULT_DATASET_PATH="bearing_featurres.csv"
+DEFAULT_DATASET_PATH = "bearing_features.csv"
 app = FastAPI(title="Bearing Intelligence API", version="2.0.1")
 app.add_middleware(
     CORSMiddleware,
@@ -209,11 +209,16 @@ def index():
 
 @app.get("/api/load-default")
 def load_default_dataset():
-    if not os.path.exists(DEFAULT_DATASET_PATH):
-        raise HTTPException(sataus_code=404,detail="Default dataset file not found.")
-    frame=pd.read_csv(DEFAULT_DATASET_PATH)
-    result=analyze_frame(frame)
-    result["filename"]="bearing_features.csv (NASA IMS Benchmark)"
+    path = DEFAULT_DATASET_PATH
+    if not os.path.exists(path):
+        parent_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "bearing_features.csv")
+        if os.path.exists(parent_path):
+            path = parent_path
+        else:
+            raise HTTPException(status_code=404, detail="Default dataset file (bearing_features.csv) not found.")
+    frame = pd.read_csv(path)
+    result = analyze_frame(frame)
+    result["filename"] = "bearing_features.csv (NASA IMS Benchmark)"
     return result
 @app.post("/api/analyze")
 async def analyze(file: UploadFile = File(...)):

@@ -84,18 +84,17 @@
     </article>
   </div>
 </section>
-      <section class="hero"><div><p class="eyebrow">INTELLIGENCE CONSOLE / 02</p><h1>See failure <em>before</em><br/>it happens.</h1><p class="hero-copy">Upload a vibration feature dataset and get a live, dataset-specific view of machine health. No static evaluation images. Every metric is calculated from your current file.</p></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">IMS<br/><small>LIVE</small></div></div></section>
+      <section class="hero"><div><p class="eyebrow">INTELLIGENCE CONSOLE / 02</p><h1>See failure <em>before</em><br/>it happens.</h1><p class="hero-copy">NASA IMS vibration benchmark dataset is preloaded directly. Explore live failure diagnostics, signal trends, and risk engines automatically without having to download or upload anything.</p></div><div class="hero-orbit"><div class="orbit-ring"></div><div class="orbit-core">IMS<br/><small>LIVE</small></div></div></section>
       <section class="upload-zone" id="drop-zone">
         <div class="upload-icon">↥</div>
-        <div><h2>Drop a CSV dataset here</h2>
-          <p>or click to browse • labelled data unlocks real evaluation metrics</p>
+        <div><h2>NASA IMS Dataset Preloaded (Active)</h2>
+          <p>Drop a custom CSV here to analyze new data, or click to switch files</p>
         </div>
         <input id="file-input" type="file" accept=".csv" hidden/>
         <div style="display:flex; gap:10px; margin-top: 10px;">
-          <button id="browse-btn" class="button secondary">Choose file</button>
-          <button id="load-default-btn" class="button primary">⚡ Load NASA IMS Dataset</button>
+          <button id="browse-btn" class="button secondary">Upload Custom File</button>
+          <button id="load-default-btn" class="button primary">⚡ Reload NASA IMS Dataset</button>
         </div>
-        
       </section>
       <div id="file-meta" class="file-meta hidden"></div>
       <section id="dashboard" class="hidden">

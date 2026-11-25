@@ -191,25 +191,42 @@ with st.sidebar:
 upload_tab, manual_tab, model_tab = st.tabs(["📁 Explore & diagnose", "🧪 Manual prediction", "📊 Model evaluation"])
 
 with upload_tab:
-    uploaded_file = st.file_uploader("Upload any CSV with model features", type=["csv"], help="Exploration works with any CSV. Diagnosis additionally requires the trained feature columns.")
-    if uploaded_file is None:
+    uploaded_file = st.file_uploader(
+        "Upload custom CSV (Optional — NASA IMS Benchmark is preloaded below)",
+        type=["csv"],
+        help="Exploration works with any CSV. Diagnosis additionally requires the trained feature columns."
+    )
+    
+    if uploaded_file is not None:
+        source_name = uploaded_file.name
+        uploaded_df = pd.read_csv(uploaded_file)
+        file_token = f"{uploaded_file.name}:{uploaded_file.size}"
+    elif os.path.exists("bearing_features.csv"):
+        source_name = "bearing_features.csv (NASA IMS Benchmark - Preloaded)"
+        uploaded_df = pd.read_csv("bearing_features.csv")
+        file_token = "default_ims_bearing_features"
+        st.info("⚡ **Directly Loaded:** NASA IMS Benchmark dataset (`bearing_features.csv`) is automatically loaded. You can explore it below or upload your own CSV above.")
+    else:
+        uploaded_df = None
+        source_name = None
+        file_token = None
+
+    if uploaded_df is None:
         st.info("Upload a feature CSV to populate the live health dashboard.")
         with st.expander("Required columns for diagnosis"):
             st.code("\n".join(feature_columns))
     else:
         try:
-            uploaded_df = pd.read_csv(uploaded_file)
-            file_token = f"{uploaded_file.name}:{uploaded_file.size}"
             if st.session_state.get("file_token") != file_token:
                 st.session_state["file_token"] = file_token
                 st.session_state.pop("result_df", None)
             numeric = numeric_columns(uploaded_df)
-            st.success(f"Loaded **{uploaded_df.shape[0]:,} rows** × **{uploaded_df.shape[1]} columns**")
+            st.success(f"Active dataset: **{source_name}** ({uploaded_df.shape[0]:,} rows × {uploaded_df.shape[1]} columns)")
             st.markdown("### Dataset health overview")
             quality = uploaded_df[numeric].isna().sum().sum() if numeric else 0
             unique_ratio = uploaded_df.nunique().mean() / max(len(uploaded_df), 1) if len(uploaded_df) else 0
             cards = [
-                ("Rows analysed", f"{len(uploaded_df):,}", "observations in upload"),
+                ("Rows analysed", f"{len(uploaded_df):,}", "observations in active file"),
                 ("Signals", f"{len(numeric):,}", "numeric features detected"),
                 ("Data quality", "Clean" if quality == 0 else f"{quality:,} missing", "numeric values checked"),
                 ("Diversity", f"{unique_ratio:.1%}", "average unique ratio"),
@@ -228,9 +245,12 @@ with upload_tab:
             if missing:
                 st.warning("Exploration is available, but diagnosis needs these missing model columns:")
                 st.code("\n".join(missing))
-            elif st.button("Run fault diagnosis", type="primary", use_container_width=True):
-                with st.spinner("Analysing uploaded observations..."):
+            else:
+                if "result_df" not in st.session_state:
                     st.session_state["result_df"] = predict_bearing_state(uploaded_df)
+                if st.button("Re-run fault diagnosis", type="primary", use_container_width=True):
+                    with st.spinner("Analysing observations..."):
+                        st.session_state["result_df"] = predict_bearing_state(uploaded_df)
 
             result_df = st.session_state.get("result_df")
             if result_df is not None:

@@ -119,23 +119,35 @@ async function upload(file) {
   const form = new FormData(); form.append('file', file);
   try { const response = await fetch('/api/analyze', { method: 'POST', body: form }); const data = await response.json(); if (!response.ok) throw new Error(data.detail || 'Upload failed'); render(data); $('file-meta').textContent = `${file.name} • ${file.size.toLocaleString()} bytes`; } catch (error) { showError(error.message); }
 }
-async function loadDefaultDataset(){
-  hiddenError();
-  $('file-meta').textContent='Loading default nasa ims dataset...';
+async function loadDefaultDataset() {
+  hideError();
+  $('file-meta').textContent = 'PRELOADING NASA IMS BENCHMARK DATASET...';
   $('file-meta').classList.remove('hidden');
-  try{
-    const response=await fetch('/api/load-default');
-    const data=await response.json();
-    if(!response.ok) throw new Error(data.detail||'Failed to load default dataset');
+  try {
+    const response = await fetch('/api/load-default');
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || 'Failed to load default dataset');
     render(data);
-    $('file-meta').textContent='Loading bearing_features.csv directly from server';
-  }catch(error){
+    $('file-meta').textContent = 'Preloaded: bearing_features.csv (NASA IMS Benchmark) • Ready';
+  } catch (error) {
     showError(error.message);
   }
 }
-$('load-default-btn').onClick=loadDefaultDataset;
-$('browse-btn').onclick = () => $('file-input').click(); $('file-input').onchange = (event) => event.target.files[0] && upload(event.target.files[0]);
-$('drop-zone').ondragover = (event) => { event.preventDefault(); $('drop-zone').classList.add('drag'); }; $('drop-zone').ondragleave = () => $('drop-zone').classList.remove('drag'); $('drop-zone').ondrop = (event) => { event.preventDefault(); $('drop-zone').classList.remove('drag'); event.dataTransfer.files[0] && upload(event.dataTransfer.files[0]); };
-$('reset-btn').onclick = () => { active = null; $('dashboard').classList.add('hidden'); $('file-meta').classList.add('hidden'); $('file-input').value = ''; };
-fetch('/api/health').then((response) => response.json()).then((data) => { $('api-status').textContent = data.status.toUpperCase(); $('api-status').previousElementSibling.style.background = '#1de0bf'; $('model-name').textContent = data.model || 'NO MODEL'; }).catch(() => { $('api-status').textContent = 'OFFLINE'; });
+if ($('load-default-btn')) $('load-default-btn').onclick = loadDefaultDataset;
+$('browse-btn').onclick = () => $('file-input').click();
+$('file-input').onchange = (event) => event.target.files[0] && upload(event.target.files[0]);
+$('drop-zone').ondragover = (event) => { event.preventDefault(); $('drop-zone').classList.add('drag'); };
+$('drop-zone').ondragleave = () => $('drop-zone').classList.remove('drag');
+$('drop-zone').ondrop = (event) => { event.preventDefault(); $('drop-zone').classList.remove('drag'); event.dataTransfer.files[0] && upload(event.dataTransfer.files[0]); };
+$('reset-btn').onclick = () => { loadDefaultDataset(); };
+
+fetch('/api/health').then((response) => response.json()).then((data) => {
+  $('api-status').textContent = data.status.toUpperCase();
+  $('api-status').previousElementSibling.style.background = '#1de0bf';
+  $('model-name').textContent = data.model || 'NO MODEL';
+  // Automatically load the dataset directly into the UI on page load:
+  loadDefaultDataset();
+}).catch(() => {
+  $('api-status').textContent = 'OFFLINE';
+});
 initThree();
